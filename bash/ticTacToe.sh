@@ -82,18 +82,25 @@ if [ "$expected" = "$(get_diag_up)" ] || [ "$expected" = "$(get_diag_down)" ];th
 fi
 }
 
-function read_input_from_player {
-	read -p "Player $1: Provide x,y: " input
+function read_input {
+is_valid="NO"
+read -p "Player $1: Provide x,y: " input
+log_debug "Read input: '$input'"
+if ! [[ "$input" =~ [1-3],[1-3] ]]; then
+	is_valid="Invalid '[1-3],[1-3]' pattern"
+else
 	IFS=",";read -a inputs <<< "$input"
 	printf "\n"
 	is_valid=$(validate_input ${inputs[0]} ${inputs[1]})
-	while [ "OK" != "$is_valid" ];do
-		echo "Your input was incorrect ($input), please review the current array state and update your input"
-		read -p "Provide x,y: " input
-        	IFS=",";read -a inputs <<< "$input"
-        	printf "\n"
-        	is_valid=$(validate_input ${inputs[0]} ${inputs[1]})
-	done
+fi
+while [ "OK" != "$is_valid" ];do
+        echo "[$is_valid] Your input ($input) was incorrect, please review the current array state and update your input"
+	read_input
+done
+}
+
+function process_game_step {
+	read_input $1
 	set_value_at_array ${inputs[0]} ${inputs[1]} $1
         print_array
 	check_winner $1
@@ -104,7 +111,7 @@ echo "Welcome in TicTacToe"
 print_array
 for step in X O X O X O X O X;do
 	log_debug "step $step"
-	read_input_from_player $step
+	process_game_step $step
 done
 echo "DRAW: nobody won"
 exit 0

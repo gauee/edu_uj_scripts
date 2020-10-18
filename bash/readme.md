@@ -86,4 +86,4 @@ Player X: Won the game
 ```
 
 #### TODOs:
-* Improve the user input validation
+* ~~Improve the user input validation~~
