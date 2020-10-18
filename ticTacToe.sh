@@ -25,15 +25,35 @@ log_debug $id
 ARRAY[$id]=$value
 }
 
+function validate_input {
+id="$(( $1*3-3+$2 ))"
+if [ ${ARRAY[$id]} = " " ];then
+	echo "OK"
+else
+	echo "ERR"
+fi
+}
+
+function read_input_from_player {
+	echo "Player $1"
+	read -p "Provide x,y: " input
+	IFS=",";read -a inputs <<< "$input"
+	printf "\n"
+	is_valid=$(validate_input ${inputs[0]} ${inputs[1]})
+	while [ "OK" != "$is_valid" ];do
+		echo "Your input was incorrect ($input), please review the current array state and update your input"
+		read -p "Provide x,y: " input
+        	IFS=",";read -a inputs <<< "$input"
+        	printf "\n"
+        	is_valid=$(validate_input ${inputs[0]} ${inputs[1]})
+	done
+	set_value_at_array ${inputs[0]} ${inputs[1]} $1
+        print_array
+}
+	
+
 echo "Welcome in TicTacToe"
 while true;do
-	print_array
-	echo "[X] Player #1: Provide input"
-	read input_1
-	set_value_at_array $(echo $input_1 | awk '{print $1}') $(echo $input_1 | awk '{print $2}') X
-	print_array
-	echo "[O] Player #2: Provide input"
-	read input_2
-	set_value_at_array $(echo $input_2 | awk '{print $1}') $(echo $input_2 | awk '{print $2}') O
-	print_array
+	read_input_from_player 'X'
+	read_input_from_player 'O'
 done
