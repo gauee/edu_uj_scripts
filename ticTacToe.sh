@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #LOG_DEBUG=1
+#ACTIVE_CLEAR=1
 ARRAY=( " " " " " " " " " " " " " " " " " ")
 
 log_debug(){
@@ -32,6 +33,9 @@ echo "${ARRAY[6]}${ARRAY[4]}${ARRAY[2]}"
 }
 
 function print_array {
+if [ $ACTIVE_CLEAR ];then
+	clear
+fi
 echo -e " |x\t|1|2|3|"
 echo -e "y| "
 for y in {1..3};do
