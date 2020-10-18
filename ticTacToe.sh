@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOG_DEBUG=1
+#LOG_DEBUG=1
 ARRAY=( " " " " " " " " " " " " " " " " " ")
 
 log_debug(){
@@ -10,17 +10,37 @@ fi
 }
 
 function calc_id {
-echo "$(( $2*3-3+$1-1))"
+echo "$(( $1*3-3+$2-1))"
+}
+
+function get_col_str {
+id=$(calc_id $1 1)
+echo "${ARRAY[$id]}${ARRAY[$id+1]}${ARRAY[$id+2]}"
+}
+
+function get_row_str {
+id=$(calc_id 1 $1)
+echo "${ARRAY[$id]}${ARRAY[${id}+3]}${ARRAY[${id}+6]}"
+}
+
+function get_diag_down {
+echo "${ARRAY[0]}${ARRAY[4]}${ARRAY[8]}"
+}
+
+function get_diag_up {
+echo "${ARRAY[6]}${ARRAY[4]}${ARRAY[2]}"
 }
 
 function print_array {
+echo -e " |x\t|1|2|3|"
+echo -e "y| "
 for y in {1..3};do
-	line=""
+	line="$y\t"
 	for x in {1..3};do
 		id=$(calc_id $x $y)
 		line="$line|${ARRAY[$id]}"
 	done
-	echo "$line|"
+	echo -e "$line|"
 done 
 }
 
@@ -39,6 +59,25 @@ else
 fi
 }
 
+function check_winner {
+expected="$1$1$1"
+log_debug "Expecting: $expected"
+for i in {1..3};do
+	log_debug "Row $i: $(get_row_str $i)"
+	log_debug "Col $i: $(get_col_str $i)"
+	if [ "$expected" = "$(get_row_str $i)" ] || [ "$expected" = "$(get_col_str $i)" ];then
+		echo "Player $1: Won the game"
+		exit 0
+	fi
+done
+log_debug "Dial up: $(get_diag_up)"
+log_debug "Dial_down: $(get_diag_down)"
+if [ "$expected" = "$(get_diag_up)" ] || [ "$expected" = "$(get_diag_down)" ];then
+        echo "Player $1: Won the game"
+	exit 0
+fi
+}
+
 function read_input_from_player {
 	read -p "Player $1: Provide x,y: " input
 	IFS=",";read -a inputs <<< "$input"
@@ -53,11 +92,15 @@ function read_input_from_player {
 	done
 	set_value_at_array ${inputs[0]} ${inputs[1]} $1
         print_array
+	check_winner $1
 }
-	
+
 
 echo "Welcome in TicTacToe"
-while true;do
-	read_input_from_player 'X'
-	read_input_from_player 'O'
+print_array
+for step in X O X O X O X O X;do
+	log_debug "step $step"
+	read_input_from_player $step
 done
+echo "DRAW: nobody won"
+exit 0
