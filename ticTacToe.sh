@@ -25,9 +25,15 @@ log_debug $id
 ARRAY[$id]=$value
 }
 
-
-print_array
-set_value_at_array 1 1 'X'
-print_array
-set_value_at_array 2 1 'O'
-print_array
+echo "Welcome in TicTacToe"
+while true;do
+	print_array
+	echo "[X] Player #1: Provide input"
+	read input_1
+	set_value_at_array $(echo $input_1 | awk '{print $1}') $(echo $input_1 | awk '{print $2}') X
+	print_array
+	echo "[O] Player #2: Provide input"
+	read input_2
+	set_value_at_array $(echo $input_2 | awk '{print $1}') $(echo $input_2 | awk '{print $2}') O
+	print_array
+done
