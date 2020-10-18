@@ -9,24 +9,29 @@ if [ $LOG_DEBUG ];then
 fi
 }
 
+function calc_id {
+echo "$(( $2*3-3+$1-1))"
+}
+
 function print_array {
-for x in {0..2};do
-	idx="$(( $x*3 ))"
-	echo "|${ARRAY[$idx]}|${ARRAY[$idx+1]}|${ARRAY[$idx+2]}|"
+for y in {1..3};do
+	line=""
+	for x in {1..3};do
+		id=$(calc_id $x $y)
+		line="$line|${ARRAY[$id]}"
+	done
+	echo "$line|"
 done 
 }
 
 function set_value_at_array {
-idx=$1
-idy=$2
-value=$3
-id="$(( $idy*3-3+$idx ))"
+id="$(calc_id $1 $2)"
 log_debug $id
-ARRAY[$id]=$value
+ARRAY[$id]=$3
 }
 
 function validate_input {
-id="$(( $1*3-3+$2 ))"
+id=$(calc_id $1 $2)
 if [ ${ARRAY[$id]} = " " ];then
 	echo "OK"
 else
@@ -35,8 +40,7 @@ fi
 }
 
 function read_input_from_player {
-	echo "Player $1"
-	read -p "Provide x,y: " input
+	read -p "Player $1: Provide x,y: " input
 	IFS=",";read -a inputs <<< "$input"
 	printf "\n"
 	is_valid=$(validate_input ${inputs[0]} ${inputs[1]})
